@@ -52,7 +52,11 @@ node {
     }
 
     stage('Deploy') {
-        sh 'rsync -avz -e "ssh -o StrictHostKeyChecking=no" build/libs/*.jar ec2-user@${env.BACKEND_DEV_IP}:/home/ec2-user/featureToggle/'
+        try {
+            sh 'rsync -avz -e "ssh -o StrictHostKeyChecking=no" build/libs/*.jar ec2-user@${env.BACKEND_DEV_IP}:/home/ec2-user/featureToggle/'
+        } catch (Exception e) {
+            echo "Deploy 실패"
+        }
     }
 
     stage('Results') {
