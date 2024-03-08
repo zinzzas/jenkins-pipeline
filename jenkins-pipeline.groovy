@@ -40,15 +40,8 @@ node {
             if (isUnix()) {
                 sh 'chmod +x gradlew'
                 sh './gradlew clean bootJar'
-            } else {
-                bat(/"%GRADLE_HOME%\bin\gradle" clean bootJar/)
             }
         }
-    }
-
-    stage('Deploy') {
-        echo '=========> Deploy'
-        sh 'pwd'
     }
 
     stage('Deploy') {
@@ -56,13 +49,8 @@ node {
             sh 'rsync -avz -e "ssh -o StrictHostKeyChecking=no" build/libs/*.jar ec2-user@${env.BACKEND_DEV_IP}:/home/ec2-user/featureToggle/'
         } catch (Exception e) {
             echo "Deploy 실패"
+            throw e
         }
-    }
-
-    stage('Results') {
-        echo '결과를 처리 중입니다.'
-        //junit '**/build/test-results/test/*.xml'
-        archiveArtifacts 'build/libs/*.jar'
     }
 
     slackSend(channel: 'C06MHKLH8MD', message: "Job End")
